@@ -5,6 +5,7 @@ from api.serializers import CompanySerializer, EmployeeSerializer, CompEmpSerial
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.pagination import PageNumberPagination
 # Create your views here.
 class CompanyViewSet(viewsets.ModelViewSet):
     queryset=Company.objects.all()
@@ -24,17 +25,21 @@ class CompanyViewSet(viewsets.ModelViewSet):
 class EmployeeViewSet(viewsets.ModelViewSet):
     queryset=Employee.objects.all()
     serializer_class=EmployeeSerializer
+    pagination_class = PageNumberPagination
 
 class CompanyGeneric(viewsets.generics.GenericAPIView):
     queryset = Company.objects.all()
+    pagination_class = PageNumberPagination
     serializer_class = CompanySerializer
     def get(self, request):
-        result_list = self.serializer_class(self.get_queryset(), many=True)
-        return Response(result_list.data)
+        result_list = self.paginate_queryset(self.get_queryset()) 
+        serializer = self.serializer_class(result_list, many=True)
+        return self.get_paginated_response(serializer.data)
 
 
 class CompanyEmployeeGeneric(viewsets.generics.GenericAPIView):
     queryset = Company.objects.all()
+    pagination_class = PageNumberPagination 
     # serializer_class = CompEmpSerializer
     def get(self, request,pk):
         result_list = self.get_queryset().filter(company_id=pk).first()
