@@ -1,17 +1,23 @@
 from rest_framework import serializers
-from api.models import company, Employee
+from api.models import Company, Employee
 
 #create serializers here
-class CompanySerializer(serializers.HyperlinkedModelSerializer):
-    company_id=serializers.ReadOnlyField()
+class CompanySerializer(serializers.ModelSerializer):
     class Meta:
-        model=company
+        model=Company
         fields="__all__"
     
 
 
-class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
-    id=serializers.ReadOnlyField()
+class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
-        model=Employee
-        fields="__all__"
+        model = Employee
+        fields=["emp_id","name", "address", "email", "phone"]
+
+
+class CompEmpSerializer(serializers.ModelSerializer):
+    Employee_in_company = EmployeeSerializer(many=True, source="employee_set")
+    class Meta:
+        model = Company
+        fields = ['company_id', 'name','location','about', 'type','added_date', 'active','Employee_in_company']
+        

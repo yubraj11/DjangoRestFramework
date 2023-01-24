@@ -1,5 +1,5 @@
 from django.contrib import admin
-from api.models import company, Employee
+from api.models import Company, Employee
 # Register your models here.
 class CompanyAdmin(admin.ModelAdmin):
     list_display=('name','location','type')
@@ -7,5 +7,5 @@ class CompanyAdmin(admin.ModelAdmin):
 class EmployeeAdmin(admin.ModelAdmin):
     list_display=('name','address','c_id')
 
-admin.site.register(company, CompanyAdmin)
+admin.site.register(Company, CompanyAdmin)
 admin.site.register(Employee,EmployeeAdmin)
