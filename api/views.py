@@ -6,6 +6,11 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
+from .pagination import DynamicPagination
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
+from .filter import CompanyFilter
+
 # Create your views here.
 class CompanyViewSet(viewsets.ModelViewSet):
     queryset=Company.objects.all()
@@ -25,17 +30,30 @@ class CompanyViewSet(viewsets.ModelViewSet):
 class EmployeeViewSet(viewsets.ModelViewSet):
     queryset=Employee.objects.all()
     serializer_class=EmployeeSerializer
-    pagination_class = PageNumberPagination
+    pagination_class = DynamicPagination
+    filter_backends = [SearchFilter, OrderingFilter]
+    search_fields = ['emp_id','name', 'address']
 
 class CompanyGeneric(viewsets.generics.GenericAPIView):
     queryset = Company.objects.all()
-    pagination_class = PageNumberPagination
+    # pagination_class = DynamicPagination
     serializer_class = CompanySerializer
+    filter_backends = [SearchFilter, DjangoFilterBackend]
+    filter_class = CompanyFilter
+    search_fields = ['name', 'location','about']  
+    filterset_fields = ['name', 'location']
     def get(self, request):
-        result_list = self.paginate_queryset(self.get_queryset()) 
+        filter_list = self.filter_queryset(self.get_queryset())
+
+#core coding for filterset to filter data with lowercase as well as uppercase 
+        
+        if request.GET.get('name'):
+            if not filter_list:
+                filter_list = self.get_queryset().filter(name__icontains=request.GET.get('name')) 
+
+        result_list = self.paginate_queryset(filter_list)
         serializer = self.serializer_class(result_list, many=True)
         return self.get_paginated_response(serializer.data)
-
 
 class CompanyEmployeeGeneric(viewsets.generics.GenericAPIView):
     queryset = Company.objects.all()
