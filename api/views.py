@@ -11,10 +11,16 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from .filter import CompanyFilter
 
+
 # Create your views here.
 class CompanyViewSet(viewsets.ModelViewSet):
     queryset=Company.objects.all()
     serializer_class=CompanySerializer
+    pagination_class = DynamicPagination
+    filter_backends = [SearchFilter, DjangoFilterBackend]
+    filter_class = CompanyFilter
+    search_fields = ['name', 'location']  
+    filterset_fields = ['name', 'location']
 
     
     #/company/{company id}/employee

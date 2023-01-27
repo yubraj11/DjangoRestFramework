@@ -11,4 +11,5 @@ urlpatterns = [
     path('', include(router.urls)),
     path("compgen/", CompanyGeneric.as_view()),
     path("compgen/<int:pk>/", CompanyEmployeeGeneric.as_view()),
+
 ]
