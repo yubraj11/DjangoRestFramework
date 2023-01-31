@@ -10,10 +10,14 @@ from .pagination import DynamicPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from .filter import CompanyFilter
-
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 # Create your views here.
 class CompanyViewSet(viewsets.ModelViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     queryset=Company.objects.all()
     serializer_class=CompanySerializer
     pagination_class = DynamicPagination
@@ -34,6 +38,9 @@ class CompanyViewSet(viewsets.ModelViewSet):
 
 
 class EmployeeViewSet(viewsets.ModelViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     queryset=Employee.objects.all()
     serializer_class=EmployeeSerializer
     pagination_class = DynamicPagination
@@ -41,6 +48,10 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     search_fields = ['emp_id','name', 'address']
 
 class CompanyGeneric(viewsets.generics.GenericAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+
     queryset = Company.objects.all()
     # pagination_class = DynamicPagination
     serializer_class = CompanySerializer
@@ -62,6 +73,9 @@ class CompanyGeneric(viewsets.generics.GenericAPIView):
         return self.get_paginated_response(serializer.data)
 
 class CompanyEmployeeGeneric(viewsets.generics.GenericAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     queryset = Company.objects.all()
     pagination_class = PageNumberPagination 
     # serializer_class = CompEmpSerializer

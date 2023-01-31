@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework_swagger',
     'drf_yasg',
     'drf_spectacular',
+    'rest_framework_simplejwt',
     
 ]
 
@@ -147,5 +148,9 @@ REST_FRAMEWORK = {
     'SEARCH_PARAM': 'q',
 
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
 
 }
