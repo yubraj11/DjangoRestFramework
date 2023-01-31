@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include, re_path
 from .views import homepage
+from account.views import Login
 from rest_framework_swagger.views import get_swagger_view
 # from rest_framework import permissions
 # from drf_yasg.views import get_schema_view
@@ -47,11 +48,11 @@ urlpatterns = [
 
     # path('apidoc/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 
-    path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    # path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     # path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     path('admin/', admin.site.urls),
     path('home/', homepage),
     path("api/v1/", include('api.urls')),
-    
+    path("api/auth/v1/", include('account.urls')),    
 ]
