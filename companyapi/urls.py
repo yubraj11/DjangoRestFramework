@@ -54,5 +54,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('home/', homepage),
     path("api/v1/", include('api.urls')),
+    path("api/v1/", include('sendemail.urls')),
     path("api/auth/v1/", include('account.urls')),    
 ]

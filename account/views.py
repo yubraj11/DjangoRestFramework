@@ -37,6 +37,9 @@ class Register(generics.GenericAPIView):
         serializer = UserSerializer(data = data)
         if serializer.is_valid():
             serializer.save()
-            return Response({'status':201, 'message':'User Created'})
+            return Response({
+                'status':201,
+                'message':'User Created'
+            })
 
             
