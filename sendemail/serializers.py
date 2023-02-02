@@ -9,3 +9,12 @@ class EmailSerializer(serializers.Serializer):
 
 class OTPSerializer(serializers.Serializer):
     email = serializers.CharField(required=True)
+
+class ValidateOtpSerializer(serializers.Serializer):
+    email = serializers.CharField(required=True)
+    otp = serializers.CharField(required=True)
+
+class ForgetPasswordSerializer(serializers.Serializer):
+    email = serializers.CharField(required=True)
+    otp = serializers.CharField(required=True)
+    newpassword = serializers.CharField(required=True)

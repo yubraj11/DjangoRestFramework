@@ -25,7 +25,7 @@ class Login(generics.GenericAPIView):
         return Response({
             'status':401,
             'message':'invalid Username or Password',
-        })
+        }, status=401)
 
 
 
