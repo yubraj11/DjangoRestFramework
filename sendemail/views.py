@@ -43,7 +43,6 @@ class SendOTP(generics.GenericAPIView):
                 if check:
                     check.otp = otp
                     check.save()
-                    # Otp.objects.filter(email=request.data.get('email')).update(otp=otp)
                 else:
                     o = Otp(email=request.data.get('email'), otp=otp)
                     o.save()
