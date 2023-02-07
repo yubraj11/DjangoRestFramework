@@ -6,9 +6,11 @@ from django.core.mail import send_mail
 from decouple import config
 import random
 from django.contrib.auth.models import User
-from .models import Otp
+from .models import OnetimePassword
 from django.contrib.auth.hashers import make_password
-
+from django.utils import timezone
+import datetime
+from dateutil import parser
 
 ######change email id of sender in .env 
 
@@ -43,12 +45,12 @@ class SendOTP(generics.GenericAPIView):
             db = User.objects.filter(email=request.data.get('email')).first()
             if db:
                 otp = random.randint(1000,9999)
-                check = Otp.objects.filter(email=request.data.get('email')).first()
+                check = OnetimePassword.objects.filter(email=request.data.get('email')).first()
                 if check:
                     check.otp = otp
                     check.save()
                 else:
-                    o = Otp(email=request.data.get('email'), otp=otp)
+                    o = OnetimePassword(email=request.data.get('email'), otp=otp)
                     o.save()
                 succ=send_mail(
                     'OTP Verification',
@@ -60,7 +62,7 @@ class SendOTP(generics.GenericAPIView):
                 if succ:
                     return Response({
                         'status':200,
-                        'message': 'OTP Sent'
+                        'message': f"OTP Sent and is valid for {config('OTP_VALIDITY_IN_SEC')} seconds"
                     })
         return Response({
             'status':400,
@@ -73,7 +75,7 @@ class validateOTP(generics.GenericAPIView):
     def post(self, request):
         serializer = ValidateOtpSerializer(data=request.data)
         if serializer.is_valid():
-            obj = Otp.objects.filter(email=request.data.get('email'), otp=request.data.get("otp")).first()
+            obj = OnetimePassword.objects.filter(email=request.data.get('email'), otp=request.data.get("otp")).first()
             if obj:
                 return Response({
                     "status":200,
@@ -91,7 +93,7 @@ class ForgetPassword(generics.GenericAPIView):
         if serializer.is_valid():
             db = User.objects.filter(email=request.data.get('email')).first()
             if db:
-                obj = Otp.objects.filter(email=request.data.get('email'), otp=request.data.get('otp'))
+                obj = OnetimePassword.objects.filter(email=request.data.get('email'), otp=request.data.get('otp'))
                 if obj:
                     newpassword = make_password(request.data.get('newpassword'))
                     db.password = newpassword
@@ -102,7 +104,30 @@ class ForgetPassword(generics.GenericAPIView):
                     },status=200)
         
         return Response({
-            "status":400,
             "message":"Bad Request"
         },status=400)
 # Create your views here.
+
+class OTPtime(generics.GenericAPIView):
+    serializer_class = ValidateOtpSerializer
+
+    def post(self, request):
+        serializer = ValidateOtpSerializer(data=request.data)
+        if serializer.is_valid():
+            obj = OnetimePassword.objects.filter(email=request.data.get('email'), otp=request.data.get("otp")).first()
+            if not obj:
+                return Response({
+                    "message":"Invalid Email or OTP"
+                }, status=400)
+            
+            if (timezone.now()-obj.modified_at).seconds <= int(config('OTP_VALIDITY_IN_SEC')):
+                return Response({
+                    "message":"OTP validated",
+                    "Elapsed time(in sec)": (timezone.now()-obj.modified_at).seconds
+                }, status=200)
+
+        return Response({
+            "message": "Bad Request or otp time out ",
+            "Elapsed time(in sec)":(timezone.now()-obj.modified_at).seconds 
+
+        }, status=400)
