@@ -6,6 +6,7 @@ class User(models.Model):
     username = models.CharField(max_length=255)
     password = models.CharField(max_length=16)
     email = models.CharField(max_length=255, null=True)
+    phone = models.CharField(max_length=255)
 
     REQUIRED_FIELDS = ['username', 'password', 'email']
     

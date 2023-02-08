@@ -9,8 +9,6 @@ from django.contrib.auth.models import User
 from .models import OnetimePassword
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
-import datetime
-from dateutil import parser
 
 ######change email id of sender in .env 
 
@@ -98,6 +96,7 @@ class ForgetPassword(generics.GenericAPIView):
                     newpassword = make_password(request.data.get('newpassword'))
                     db.password = newpassword
                     db.save()
+                    OnetimePassword.objects.filter(email=request.data.get('email'), otp=request.data.get('otp')).delete()
                     return Response({
                         "status":200,
                         "message":"Password Updated Successfully"
@@ -127,7 +126,7 @@ class OTPtime(generics.GenericAPIView):
                 }, status=200)
 
         return Response({
-            "message": "Bad Request or otp time out ",
+            "message": "OTP time out. Regenerate new one",
             "Elapsed time(in sec)":(timezone.now()-obj.modified_at).seconds 
 
         }, status=400)
