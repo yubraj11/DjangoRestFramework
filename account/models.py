@@ -2,6 +2,8 @@ from django.db import models
 
 
 class User(models.Model):
+    class Meta:
+        db_table = "account_user"
     id = models.BigAutoField(primary_key=True)
     username = models.CharField(max_length=255)
     password = models.CharField(max_length=16)
